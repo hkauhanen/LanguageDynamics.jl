@@ -1,6 +1,6 @@
 name = "LanguageDynamics"
 uuid = "4f6fb02e-1e78-4dae-9f00-b273c8976ac9"
-authors = ["Henri Kauhanen <nenahuak@gmail.com> and contributors"]
+authors = ["Henri Kauhanen <henri.kauhanen@uni-konstanz.de>"]
 version = "0.1.0"
 
 [compat]
