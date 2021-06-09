@@ -5,7 +5,7 @@ DocMeta.setdocmeta!(LanguageDynamics, :DocTestSetup, :(using LanguageDynamics); 
 
 makedocs(;
     modules=[LanguageDynamics],
-    authors="Henri Kauhanen <nenahuak@gmail.com> and contributors",
+    authors="Henri Kauhanen <henri.kauhanen@uni-konstanz.de>",
     repo="https://github.com/hkauhanen/LanguageDynamics.jl/blob/{commit}{path}#{line}",
     sitename="LanguageDynamics.jl",
     format=Documenter.HTML(;
