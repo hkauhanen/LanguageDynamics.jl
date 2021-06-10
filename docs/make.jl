@@ -15,8 +15,15 @@ makedocs(;
     ),
     pages=[
         "Home" => "index.md",
+        "Getting started" => "getting-started.md",
         "Philosophy" => "philosophy.md",
-        "Reference" => ["Replicators" => "replicators.md"]
+        "Examples" => "examples.md",
+        "Reference" => ["Populations" => "populations.md",
+                        "Interactors" => "interactors.md",
+                        "Replicators" => "replicators.md",
+                        "Auxiliaries" => "auxiliaries.md",
+                        "All functions and types" => "all.md",
+                        "The type hierarchies" => "type-hierarchies.md"]
     ],
 )
 

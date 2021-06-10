@@ -1,5 +1,10 @@
 module LanguageDynamics
 
-# Write your package code here.
+# Abstract types
+include("AbstractPopulations.jl")
+include("AbstractInteractors.jl")
+
+# Interactors
+include("EmptySpeaker.jl")
 
 end
