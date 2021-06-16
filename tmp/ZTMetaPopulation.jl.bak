@@ -1,0 +1,206 @@
+mutable struct ZTMetaPopulation{T<:AbstractInteractor}
+  # Census
+  census::Array{PoolPopulation{T}}
+
+  # Interactors' homes
+  homes::Array{Int}
+
+  # Lattice size
+  size::Int
+
+  # Decay exponent
+  de::Float64
+
+  # Probabilities
+  probabilities::Array{Float64}
+
+  # Distance function
+  distance::Function
+
+  # Range of possible distances
+  possible_distances::Dict{Int, Array{Int}}
+
+  # How many actions have occurred
+  nactions::Int
+
+  # Cells at a given distance from given cell
+  lookup::Dict{Tuple{Int, Int}, Array{Int}}
+end
+
+
+function ZTMetaPopulation{T}(K::Int, lambda::Float64) where {T<:AbstractInteractor}
+  # Possible distances on lattice
+  possdist = collect(0:2*(K-1))
+
+  # Possible distances for each cell
+  possdistcell = Dict{Int, Array{Int}}()
+
+  # Metapopulation
+  mp = Array{PoolPopulation{T}}(undef, 0)
+
+  # Add local populations
+  for i in 1:K
+    for j in 1:K
+    end
+  end
+
+  # Make lookup table
+  lup = Dict{Tuple{Int, Int}, Array{Int}}()
+  cellnumber1 = 0
+  for x in 1:K
+    for y in 1:K
+      cellnumber1 += 1
+
+      point = Point{Int}(x, y)
+
+      push!(mp, PoolPopulation{T}())
+
+      for dist in possdist
+        cellnumber = 0
+        for i in 1:K
+          for j in 1:K
+            cellnumber += 1
+            point2 = Point{Int}(i, j)
+            if manhattan(point, point2) == dist
+              if !haskey(possdistcell, cellnumber1)
+                possdistcell[cellnumber1] = Array{Int}(undef, 0)
+              end
+              push!(possdistcell[cellnumber1], dist)
+              if !haskey(lup, (cellnumber1, dist))
+                lup[(cellnumber1, dist)] = Array{Tuple{Int,Int}}(undef, 0)
+              end
+              push!(lup[(cellnumber1, dist)], cellnumber)
+            end
+          end
+        end
+      end
+      possdistcell[cellnumber1] = unique(possdistcell[cellnumber1])
+    end
+  end
+
+  # Construct
+  ZTMetaPopulation(mp, Array{Int}(undef, 0), K, lambda, zipf(2*(K-1) + 1, lambda), manhattan, possdistcell, 0, lup)
+end
+
+
+function metatravel!(x::ZTMetaPopulation)
+  # select random local population
+  randcoor = rand(1:length(x.census))
+  rp = x.census[randcoor]
+
+  # select random speaker; fail if local population empty
+  length(rp.census) > 0 || return false
+  randspeakercoor = rand(1:length(rp.census))
+  rs = rp.census[randspeakercoor]
+
+  # travel
+  home = x.homes[randspeakercoor]
+  possdist = x.possible_distances[home]
+  dist = Distributions.wsample(possdist, zipf(maximum(possdist) + 1, x.de))
+  destination = rand(x.lookup[(home, dist)])
+  inject!(rs, x.census[destination])
+  eject!(randspeakercoor, rp)
+end
+
+
+function metainject!(x::AbstractInteractor, y::ZTMetaPopulation)
+  rp = rand(1:length(y.census))
+  inject!(x, y.census[rp])
+  push!(y.homes, rp)
+end
+
+
+#=
+"""
+    inject!(x::AbstractInteractor, y::ZipfTravellerPopulation)
+
+Insert an interactor into a Zipf traveller population.
+"""
+function inject!(x::AbstractInteractor, y::ZipfTravellerPopulation)
+  push!(y.census, x)
+  home = Point{Int}(rand(1:y.size), rand(1:y.size))
+  push!(y.coordinates, home)
+  push!(y.locations, home)
+  push!(y.spatial_census[home], length(y.census))
+end
+
+
+"""
+    eject!(x::Int, y::ZipfTravellerPopulation)
+
+Remove an interactor from a Zipf traveller population.
+"""
+function eject!(x::Int, y::ZipfTravellerPopulation)
+  home = y.coordinates[x]
+  loca = y.locations[x]
+  splice!(y.census, x)
+  splice!(y.coordinates, x)
+  splice!(y.locations, x)
+  y.spatial_census[loca] = setdiff(y.spatial_census[loca], x)
+  for k in keys(y.spatial_census)
+    for i in 1:length(y.spatial_census[k])
+      if y.spatial_census[k][i] > x
+        y.spatial_census[k][i] -= 1
+      end
+    end
+  end
+end
+
+
+"""
+    travel!(x::Int, y::ZipfTravellerPopulation)
+
+Make interactor with index `x` travel in a Zipf traveller population.
+"""
+function travel!(x::Int, y::ZipfTravellerPopulation)
+  home = y.coordinates[x]
+  loca = y.locations[x]
+  possdist = y.possible_distances[home]
+  dist = Distributions.wsample(possdist, zipf(maximum(possdist) + 1, y.de))
+  y.locations[x] = rand(y.lookup[(home, dist)])
+
+  if y.locations[x] != loca
+    y.spatial_census[loca] = setdiff(y.spatial_census[loca], x)
+    push!(y.spatial_census[y.locations[x]], x)
+  end
+end
+
+
+"""
+    travel_all!(x::ZipfTravellerPopulation)
+
+Make every interactor in a Zipf traveller population travel.
+"""
+function travel_all!(x::ZipfTravellerPopulation)
+  for s in 1:length(x.census)
+    travel!(s, x)
+  end
+end
+
+
+"""
+    travel!(x::ZipfTravellerPopulation)
+
+Make a random interactor in a Zipf traveller population travel.
+"""
+function travel!(x::ZipfTravellerPopulation)
+  travel!(rand(1:length(x.census)), x)
+end
+
+
+"""
+    rendezvous!(x::ZipfTravellerPopulation)
+
+Rendezvous in a Zipf traveller population (between two random interactors
+currently in the same cell).
+"""
+function rendezvous!(x::ZipfTravellerPopulation)
+  length(x.census) > 1 || return false
+  int1 = rand(1:length(x.census))
+  location = x.locations[int1]
+  length(x.spatial_census[location]) > 1 || return false
+  friends = setdiff(x.spatial_census[location], int1)
+  int2 = rand(friends)
+  rendezvous!(x, int1, int2)
+end
+=#

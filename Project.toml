@@ -1,7 +1,10 @@
 name = "LanguageDynamics"
 uuid = "4f6fb02e-1e78-4dae-9f00-b273c8976ac9"
-authors = ["Henri Kauhanen <henri.kauhanen@uni-konstanz.de>"]
+authors = ["Henri Kauhanen <mail@hkauhanen.fi>"]
 version = "0.1.0"
+
+[deps]
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 
 [compat]
 julia = "1"

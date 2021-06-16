@@ -7,6 +7,3 @@ CurrentModule = LanguageDynamics
 ```@index
 ```
 
-```@autodocs
-Modules = [LanguageDynamics]
-```

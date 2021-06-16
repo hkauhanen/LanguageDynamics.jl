@@ -4,5 +4,8 @@ CurrentModule = LanguageDynamics
 
 # Auxiliaries
 
-yoyoyo
+```@autodocs
+Modules = [LanguageDynamics]
+Pages = ["common.jl"]
+```
 

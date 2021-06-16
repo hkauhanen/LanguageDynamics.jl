@@ -4,5 +4,8 @@ CurrentModule = LanguageDynamics
 
 # Interactors
 
-yoyoyo
+```@autodocs
+Modules = [LanguageDynamics]
+Pages = ["Interactors/Interactors.jl", "Interactors/EmptyInteractor.jl", "Interactors/MomentumSelector.jl"]
+```
 

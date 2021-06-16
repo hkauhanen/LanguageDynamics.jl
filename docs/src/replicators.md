@@ -4,5 +4,8 @@ CurrentModule = LanguageDynamics
 
 # Replicators
 
-yoyoyo
+```@autodocs
+Modules = [LanguageDynamics]
+Pages = ["Replicators/BinaryVariable.jl"]
+```
 

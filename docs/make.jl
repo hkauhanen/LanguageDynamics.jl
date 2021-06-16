@@ -5,7 +5,7 @@ DocMeta.setdocmeta!(LanguageDynamics, :DocTestSetup, :(using LanguageDynamics); 
 
 makedocs(;
     modules=[LanguageDynamics],
-    authors="Henri Kauhanen <henri.kauhanen@uni-konstanz.de>",
+    authors="Henri Kauhanen <mail@hkauhanen.fi>",
     repo="https://github.com/hkauhanen/LanguageDynamics.jl/blob/{commit}{path}#{line}",
     sitename="LanguageDynamics.jl",
     format=Documenter.HTML(;
@@ -21,6 +21,7 @@ makedocs(;
         "Reference" => ["Populations" => "populations.md",
                         "Interactors" => "interactors.md",
                         "Replicators" => "replicators.md",
+                        "Abstract types" => "abstract-types.md",
                         "Auxiliaries" => "auxiliaries.md",
                         "All functions and types" => "all.md",
                         "The type hierarchies" => "type-hierarchies.md"]
